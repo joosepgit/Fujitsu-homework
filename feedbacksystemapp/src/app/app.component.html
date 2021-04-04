@@ -1,0 +1,141 @@
+
+<div id="main-container">
+  <nav class="topnav">
+    <label class="caption">Feedback Application</label>
+    <label class="flex-child">
+      <input class="searchbar" type="search" (ngModelChange)="searchEntries(key.value)" #key="ngModel" ngModel name="key"
+             id="searchName" placeholder="Search entries...">
+      <button class="button"><img alt="search" class="search" src="../assets/searchicon.png"></button>
+    </label>
+    <label class="caption">
+      <button class="button" (click)="open(contentAdd)">Give feedback</button>
+    </label>
+  </nav>
+
+  <div class="container">
+    <table class="feedback-table" aria-label="Feedback table">
+      <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Category</th>
+        <th scope="col">Text</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let entry of entries">
+        <th scope="row">
+          <button (click)="openDelete(contentDelete, entry)">
+          <img alt="delete" src="../assets/deleteicon.png">
+          </button>
+        </th>
+        <td>{{entry.id}}</td>
+        <td>{{entry.name}}</td>
+        <td>{{entry.email}}</td>
+        <td>{{entry.categories}}</td>
+        <td>{{entry.text}}</td>
+      </tr>
+      </tbody>
+    </table>
+    <!-- Notification for no entries -->
+    <div *ngIf="entries?.length == 0" class="col-lg-12 col-md-12 col-xl-12">
+      <div class="alert alert-info" role="alert">
+        <p>No entries were found.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #contentDelete let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Alert</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <h4>Are you sure you want to delete this entry {{deleteEntry?.id}}?</h4>
+  </div>
+  <div class="modal-footer">
+    <button data-dismiss="modal" class="btn btn-danger" (click)="onDelete(deleteEntry?.id)">Delete</button>
+    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Cancel click')">Cancel</button>
+  </div>
+</ng-template>
+
+<ng-template #contentAdd let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Feedback form</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #f="ngForm" (ngSubmit)="onAddEntry(f)">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" ngModel name="name" #name="ngModel" class="form-control"
+               id="name" placeholder="Full name" required pattern="[A-Z][a-z]+ ([A-Z][a-z]+( )*)+">
+        <div *ngIf="name.invalid && (name.dirty || name.touched)"
+             class="alert alert-danger">
+          <div *ngIf="name.errors.required">
+            Name is required!
+          </div>
+          <div *ngIf="name.errors.pattern">
+            Invalid name!
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" ngModel name="email" class="form-control"
+               id="email" placeholder="Email"
+               required #email="ngModel" pattern="[A-Za-z0-9\.\-]{2,}@[A-Za-z0-9]{2,}\.[A-Za-z0-9]{2,}">
+        <div *ngIf="email.invalid && (email.dirty || email.touched)"
+             class="alert alert-danger">
+          <div *ngIf="email.errors.required">
+            Email is required!
+          </div>
+          <div *ngIf="email.errors.pattern">
+            Invalid email!
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="text">Text</label>
+        <input type="email" ngModel name="text" class="form-control"
+               id="text" placeholder="Feedback" required #text="ngModel">
+        <div *ngIf="text.invalid && (text.dirty || text.touched)"
+             class="alert alert-danger">
+          <div *ngIf="text.errors.required">
+            Text is required!
+          </div>
+        </div>
+      </div>
+      <label for="inputCategory" class="visually-hidden">Categories</label>
+      <div class="form-group">
+        <div class="mb-3">
+          <select [(ngModel)]="categoryArray" (ngModelChange)="onChange($event)" ngModel name="event"
+                  id="inputCategory" class="form-select" multiple aria-label="multiple select example"
+                  required>
+            <option value="1" disabled>Application</option>
+            <option value="10" disabled>- Health</option>
+            <option value="Patients portal">-- Patients portal</option>
+            <option value="Doctors portal">-- Doctors portal</option>
+            <option value="2" disabled>-- Remote visits portal</option>
+            <option value="Registration">--- Registration</option>
+            <option value="Virtual visit">--- Virtual visit</option>
+            <option value="22" disabled>- Document management</option>
+            <option value="OpenKM">-- OpenKM</option>
+            <option value="Microsoft SharePoint">-- Microsoft SharePoint</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button data-dismiss="modal" class="btn btn-secondary" id="add-entry-form" type="button" (click)="modal.close('Cancel click')">Close</button>
+        <button [disabled]="f.invalid" class="btn btn-info" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
